@@ -69,9 +69,9 @@ def extract_text(file_path):
 # Example usage
 if __name__ == "__main__":
     # Replace 'sample_image.jpg', 'sample_document.pdf', and 'sample_document.docx' with actual file paths for testing
-    image_path = 'sample_image.jpg'
+    image_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\images\sample_png.png"
     pdf_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\pdf\EthicsAssignment (1).pdf"
-    docx_path = 'sample_document.docx'
+    docx_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\docx\368 project proposal.docx"
 
     print("Text extracted from image:")
     print(extract_text(image_path))
