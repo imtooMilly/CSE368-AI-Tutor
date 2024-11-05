@@ -6,7 +6,7 @@ from docx import Document
 
 # Path to the Tesseract executable, adjust if necessary
 # Update based on your system
-pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
 def extract_text_from_image(image_path):
@@ -66,18 +66,18 @@ def extract_text(file_path):
         return None
 
 
-# Example usage
-if __name__ == "__main__":
-    # Replace 'sample_image.jpg', 'sample_document.pdf', and 'sample_document.docx' with actual file paths for testing
-    image_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\images\sample_png.png"
-    pdf_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\pdf\EthicsAssignment (1).pdf"
-    docx_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\docx\368 project proposal.docx"
+# # Example usage
+# if __name__ == "__main__":
+#     # Replace 'sample_image.jpg', 'sample_document.pdf', and 'sample_document.docx' with actual file paths for testing
+#     image_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\images\sample_png.png"
+#     pdf_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\pdf\EthicsAssignment (1).pdf"
+#     docx_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\docx\368 project proposal.docx"
 
-    print("Text extracted from image:")
-    print(extract_text(image_path))
+#     print("Text extracted from image:")
+#     print(extract_text(image_path))
 
-    print("\nText extracted from PDF:")
-    print(extract_text(pdf_path))
+#     print("\nText extracted from PDF:")
+#     print(extract_text(pdf_path))
 
-    print("\nText extracted from DOCX:")
-    print(extract_text(docx_path))
+#     print("\nText extracted from DOCX:")
+#     print(extract_text(docx_path))
