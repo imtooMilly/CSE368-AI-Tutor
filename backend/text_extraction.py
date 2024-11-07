@@ -2,6 +2,7 @@ import pytesseract
 from PIL import Image
 import fitz
 import os
+from text_summarization import summarize_text_local
 from docx import Document
 
 # Path to the Tesseract executable, adjust if necessary
@@ -50,19 +51,29 @@ def extract_text_from_docx(docx_path):
         return None
 
 
-def extract_text(file_path):
+def extract_and_summarize_text(file_path):
     """
-    Determine if the file is an image, PDF, or DOCX, then extract text accordingly.
+    Extract text from a file and summarize it.
     Supports .jpg, .jpeg, .png, .pdf, and .docx file formats.
     """
+    # Determine file type and extract text accordingly
     if file_path.lower().endswith(('.jpg', '.jpeg', '.png')):
-        return extract_text_from_image(file_path)
+        extracted_text = extract_text_from_image(file_path)
     elif file_path.lower().endswith('.pdf'):
-        return extract_text_from_pdf(file_path)
+        extracted_text = extract_text_from_pdf(file_path)
     elif file_path.lower().endswith('.docx'):
-        return extract_text_from_docx(file_path)
+        extracted_text = extract_text_from_docx(file_path)
     else:
         print("Unsupported file type. Please use a .jpg, .jpeg, .png, .pdf, or .docx file.")
+        return None
+
+    # If text was extracted, summarize it
+    if extracted_text:
+        # Summarize the extracted text
+        summary = summarize_text_local(extracted_text)
+        return summary
+    else:
+        print("No text extracted.")
         return None
 
 
@@ -81,3 +92,9 @@ def extract_text(file_path):
 
 #     print("\nText extracted from DOCX:")
 #     print(extract_text(docx_path))
+# Example usage
+if __name__ == "__main__":
+    # Replace with the path to your file
+    file_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\docx\368 project proposal.docx"
+    summary = extract_and_summarize_text(file_path)
+    print("Final Summary:\n", summary)
