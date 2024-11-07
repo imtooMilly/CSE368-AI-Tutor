@@ -3,11 +3,13 @@
 import os
 import requests
 from text_extraction import extract_text  # Import the text extraction function
+from dotenv import load_dotenv
+load_dotenv()
 
-# API Key and Endpoint
-# Replace 'YOUR_API_KEY' with your actual API key
-api_key = os.getenv(
-    "GOOGLE_API_KEY") or "AIzaSyCsAaseIdwZssVYs47IC0pFXKHzhus3tmQ"
+#Run pip install python-dotenv
+#Add a .env file and put your api key in the .env file --> format == api_key = "api_key"
+#Include .env in gitignore
+api_key = os.getenv("api_key")
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
 
 
