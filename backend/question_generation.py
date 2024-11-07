@@ -22,22 +22,15 @@ def generate_questions(text, num_questions=5):
     Returns:
         List[str]: A list of generated questions.
     """
-    # Set up prompt based on input text
-    prompt_text = f"Generate {num_questions} educational questions based on the following content:\n\n{text}"
-
-    headers = {
-        "Content-Type": "application/json",
-    }
-
-    # Payload structure based on the Gemini API requirements
+    # Adjusted prompt to encourage generating separate questions without explanations
+    prompt_text = f"Generate {num_questions} educational questions based on the following content without any explanations or additional context after each question:\n\n{text}"
+    headers = {"Content-Type": "application/json"}
     data = {
         "contents": [
             {
                 "role": "user",
                 "parts": [
-                    {
-                        "text": prompt_text
-                    }
+                    {"text": prompt_text}
                 ]
             }
         ]
@@ -48,17 +41,18 @@ def generate_questions(text, num_questions=5):
         response.raise_for_status()
         result = response.json()
 
-        # Extracting the generated questions from the response
-        questions = []
-        for candidate in result.get("candidates", []):
-            question_text = candidate.get("output", {}).get("text", "").strip()
-            if question_text:
-                questions.append(question_text)
+        # Extract questions from the correct field in the response
+        questions_text = result['candidates'][0]['content']['parts'][0]['text']
+        
+        # Split the response text by double line breaks or numbers (1., 2., etc.) to isolate individual questions
+        questions = [q.strip() for q in questions_text.split("\n\n") if q.strip() and not q.startswith("This")]
 
+        # Return only the requested number of questions
         return questions[:num_questions]
     except requests.exceptions.RequestException as e:
         print(f"Error generating questions with Google Gemini API: {e}")
         return []
+
 
 
 def generate_questions_from_file(file_path, num_questions=5):
