@@ -28,7 +28,7 @@ def generate_mcq(question, context=None, num_options=4):
         "answer": correct_answer
     }
 
-
+ 
 def generate_mcqs_from_questions(questions, context=None, num_options=4):
     """
     Generate multiple-choice questions (MCQs) from a list of questions.
