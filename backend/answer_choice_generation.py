@@ -26,7 +26,7 @@ def generate_mcq(question, context=None, num_options=4):
         "question": question,
         "options": options,
         "answer": correct_answer
-    }
+    } 
 
  
 def generate_mcqs_from_questions(questions, context=None, num_options=4):
