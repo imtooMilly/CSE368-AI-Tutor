@@ -38,7 +38,7 @@ def generate_questions(text, num_questions=5):
     }
 
     try:
-        response = requests.post(GEMINI_API_URL, headers=headers, json=data)
+        response = requests.post(api_key, headers=headers, json=data)
         response.raise_for_status()
         result = response.json()
 
@@ -82,7 +82,7 @@ def generate_questions_from_file(file_path, num_questions=5):
 # Example usage
 if __name__ == "__main__":
     # Update with the path to your test file
-    file_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\pdf\Georgia Tech Essays.pdf"
+    file_path = r"/Users/aaronessien/Documents/368/CSE368-AI-Tutor/backend/tests/pdf/Georgia Tech Essays.pdf"
     questions = generate_questions_from_file(file_path, num_questions=5)
     print("Generated Questions:")
     for question in questions:
