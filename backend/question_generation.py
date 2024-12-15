@@ -7,15 +7,7 @@ from dotenv import load_dotenv  # Import dotenv to load environment variables
 
 # Load environment variables from .env file
 load_dotenv()
-
-# API Key and Endpoint
-api_key = os.getenv("GOOGLE_API_KEY")
-if not api_key:
-    raise ValueError(
-        "API key not found. Please set GOOGLE_API_KEY in the .env file.")
-
-GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
-
+api_key = os.getenv("api_key")
 
 def generate_questions(text, num_questions=5):
     """
@@ -78,7 +70,8 @@ def generate_questions_from_file(file_path, num_questions=5):
 
 
 if __name__ == "__main__":
-    file_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\pdf\7-CSE305.pdf"
+    # Update with the path to your test file
+    file_path = r"/Users/aaronessien/Documents/368/CSE368-AI-Tutor/backend/tests/pdf/Georgia Tech Essays.pdf"
     questions = generate_questions_from_file(file_path, num_questions=5)
     print("Generated Questions:")
     for question in questions:
