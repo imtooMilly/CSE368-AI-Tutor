@@ -3,14 +3,19 @@
 import os
 import requests
 from text_extraction import extract_text  # Import the text extraction function
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # Import dotenv to load environment variables
 
-# Replace 'YOUR_API_KEY' with your actual API key
-#Run pip install python-dotenv
-#Add a .env file and put your api key in the .env file --> format == api_key = "api_key"
-#Include .env in gitignore
+# Load environment variables from .env file
 load_dotenv()
-api_key = os.getenv("api_key")
+
+# API Key and Endpoint
+api_key = os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    raise ValueError(
+        "API key not found. Please set GOOGLE_API_KEY in the .env file.")
+
+GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+
 
 def generate_questions(text, num_questions=5):
     """
@@ -23,7 +28,6 @@ def generate_questions(text, num_questions=5):
     Returns:
         List[str]: A list of generated questions.
     """
-    # Adjusted prompt to encourage generating separate questions without explanations
     prompt_text = f"Generate {num_questions} educational questions based on the following content without any explanations or additional context after each question:\n\n{text}"
     headers = {"Content-Type": "application/json"}
     data = {
@@ -38,22 +42,18 @@ def generate_questions(text, num_questions=5):
     }
 
     try:
-        response = requests.post(api_key, headers=headers, json=data)
+        response = requests.post(GEMINI_API_URL, headers=headers, json=data)
         response.raise_for_status()
         result = response.json()
 
-        # Extract questions from the correct field in the response
         questions_text = result['candidates'][0]['content']['parts'][0]['text']
-        
-        # Split the response text by double line breaks or numbers (1., 2., etc.) to isolate individual questions
-        questions = [q.strip() for q in questions_text.split("\n\n") if q.strip() and not q.startswith("This")]
+        questions = [q.strip() for q in questions_text.split(
+            "\n\n") if q.strip() and not q.startswith("This")]
 
-        # Return only the requested number of questions
         return questions[:num_questions]
     except requests.exceptions.RequestException as e:
         print(f"Error generating questions with Google Gemini API: {e}")
         return []
-
 
 
 def generate_questions_from_file(file_path, num_questions=5):
@@ -67,9 +67,7 @@ def generate_questions_from_file(file_path, num_questions=5):
     Returns:
         List[str]: Generated questions based on the extracted content.
     """
-    # Use extract_text to get text content from the file
     extracted_text = extract_text(file_path)
-
     if extracted_text:
         questions = generate_questions(
             extracted_text, num_questions=num_questions)
@@ -79,10 +77,8 @@ def generate_questions_from_file(file_path, num_questions=5):
         return []
 
 
-# Example usage
 if __name__ == "__main__":
-    # Update with the path to your test file
-    file_path = r"/Users/aaronessien/Documents/368/CSE368-AI-Tutor/backend/tests/pdf/Georgia Tech Essays.pdf"
+    file_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\pdf\7-CSE305.pdf"
     questions = generate_questions_from_file(file_path, num_questions=5)
     print("Generated Questions:")
     for question in questions:
