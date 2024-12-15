@@ -10,7 +10,9 @@ from dotenv import load_dotenv
 #Add a .env file and put your api key in the .env file --> format == api_key = "api_key"
 #Include .env in gitignore
 load_dotenv()
-api_key = os.getenv("api_key")
+api_key = os.getenv(
+    "GOOGLE_API_KEY") or "AIzaSyCsAaseIdwZssVYs47IC0pFXKHzhus3tmQ"
+api_key = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
 
 def generate_questions(text, num_questions=5):
     """
@@ -82,7 +84,7 @@ def generate_questions_from_file(file_path, num_questions=5):
 # Example usage
 if __name__ == "__main__":
     # Update with the path to your test file
-    file_path = r"/Users/aaronessien/Documents/368/CSE368-AI-Tutor/backend/tests/pdf/Georgia Tech Essays.pdf"
+    file_path = r"/Users/aaronessien/Documents/368/CSE368-AI-Tutor/backend/static/files"
     questions = generate_questions_from_file(file_path, num_questions=5)
     print("Generated Questions:")
     for question in questions:
