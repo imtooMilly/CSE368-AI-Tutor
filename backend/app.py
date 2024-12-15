@@ -12,7 +12,7 @@ app.config['UPLOAD_FOLDER'] = 'static/files'
 
 class UploadFileForm(FlaskForm):
     file = FileField("File", validators=[InputRequired()])
-    submit = SubmitField("Upload File")
+    submit = SubmitField("Generate Quiz")
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home', methods=['GET', 'POST'])
@@ -28,14 +28,22 @@ def home():
         )
         file.save(file_path)
 
-        # Generate questions from uploaded file
+        # Generate questions and MCQs from uploaded file
         try:
-            questions = generate_questions_from_file(file_path, num_questions=5)
-            if not questions:
+            quiz_data = generate_questions_from_file(file_path, num_questions=5)
+
+            if not quiz_data['questions'] and not quiz_data['mcqs']:
                 return render_template('index.html', form=form, error="No questions could be generated from the file.")
-            return render_template('index.html', form=form, questions=questions)
+
+            return render_template(
+                'index.html',
+                form=form,
+                questions=quiz_data['questions'],  # Open-ended questions
+                mcqs=quiz_data['mcqs']  # Multiple-choice questions
+            )
         except Exception as e:
             return render_template('index.html', form=form, error=f"An error occurred: {str(e)}")
+
     return render_template('index.html', form=form)
 
 if __name__ == '__main__':
