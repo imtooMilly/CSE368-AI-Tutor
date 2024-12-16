@@ -1,19 +1,18 @@
-import { useState } from 'react';
-import { Routes, Route } from 'react-router-dom'; // Remove BrowserRouter import
-import Home from './pages/Home';
-import Login from './pages/Login';
-import './App.css';
+import { useState } from 'react'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import{BrowserRouter, Routes, Route} from 'react-router-dom'
+import Signup from './Signup'
+import Login from './Login'
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <Routes>
-      {/* Define the routes and the components to be rendered */}
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-    </Routes>
-  );
+    <BrowserRouter>
+      <Routes>
+        <Route path='/register' element={<Signup />}></Route>
+        <Route path='/login' element={<Login />}></Route>
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
 export default App;
