@@ -1,25 +1,32 @@
-from flask import Flask, send_from_directory
-import os
+from flask import Flask
+import json, jsonify
+from .database import accounts, chats
+
 
 def create_app(test_config=None):
-    # Specify client/build as the static folder
-    app = Flask(__name__, static_folder='../client/build', static_url_path='/')
+    app = Flask(__name__, static_folder='./static', static_url_path='/')
 
-    @app.after_request
-    def apply_no_sniff(response):
-        response.headers['X-Content-Type-Options'] = 'nosniff'
-        return response
-
-    # Serve the React app's index.html for the root and unmatched routes
+    # Serve React's index.html for the base route
     @app.route('/')
-    @app.route('/<path:path>')
-    def serve_react_app(path=""):
-        # Check if the requested path exists in the static folder
-        if path and os.path.exists(os.path.join(app.static_folder, path)):
-            return send_from_directory(app.static_folder, path)
-        else:
-            # Serve index.html for unmatched routes
-            return send_from_directory(app.static_folder, 'index.html')
+    def send_index():
+        return app.send_static_file('index.html')
+
+    # Serve React's index.html for /login, /register, and /chat
+    @app.route('/login')
+    def login():
+        return app.send_static_file('index.html')
+
+    @app.route('/register')
+    def register():
+        return app.send_static_file('index.html')
+
+    @app.route('/chat')
+    def chat():
+        return app.send_static_file('index.html')
+    
+    @app.route('/chat-history', methods=['GET'])
+    def pull_history():
+        history = chats.getChatHistory()
+        return jsonify(history), 200
 
     return app
-

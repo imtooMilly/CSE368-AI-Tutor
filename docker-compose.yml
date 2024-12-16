@@ -2,17 +2,11 @@ version: "3.3"
 services:
   mongo:
     image: mongo:4.2.5
-    container_name: mongodb
     ports:
       - "27017:27017"
-
   app:
     build: .
-    container_name: app
     environment:
       WAIT_HOSTS: mongo:27017
     ports:
-      - "3000:3000" # React Dev Server
-      - "8080:8080" # Flask Backend
-    depends_on:
-      - mongo
+      - "8080:8080"

@@ -1,3 +1,59 @@
 from . import db
 
-chats = db["chats"]
+from datetime import datetime
+from bson import ObjectId
+from secrets import token_urlsafe
+from html import escape
+
+chats = db['chats']
+
+# Create a dummy message
+message = "Hello, this is a test message."
+    
+# Insert the dummy message into the collection
+chats.insert_one(
+        {
+            "chat": message,
+            "creatorID": "Guest",
+        }
+    )
+
+
+def getChatHistory():
+    chatHistory = list(chats.find({}, {"_id": 0}))
+    return chatHistory
+
+def postChat(message, user):
+    chats.insert_one(
+        {
+            "chat": message,
+            "creatorID": "Guest",
+        }
+    )
+    return True
+
+def create_comment(board_id, creator_id, content):
+    comment_id = token_urlsafe()
+    new_comment = {
+        "id": comment_id,
+        "BoardId": board_id,
+        "CreatorId": creator_id,
+        "Content": content,
+        "Time": datetime.now()
+    }
+    chats.insert_one(new_comment)
+    return comment_id
+
+def delete_comment(comment_id, user_id):
+    comment = chats.find_one({"id", comment_id}, {"_id": False})
+    if comment and comment['CreatorId'] == user_id:
+        result = chats.delete_one({"id": comment_id})
+        return result.deleted_count == 1
+    else:
+        return False
+    
+def delete_comments(board_id):
+    chats.delete_many({"BoardId": board_id})
+    
+def get_comments(board_id):
+    return list(chats.find({"BoardId": board_id}, {"_id": False}))
