@@ -1,0 +1,11 @@
+flask
+flask_wtf
+pyjwt
+pymongo
+requests
+pytesseract
+fitz
+frontend
+tools
+docx
+exceptions

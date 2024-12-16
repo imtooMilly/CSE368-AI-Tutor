@@ -20,6 +20,17 @@ chats = db['chatHistory']  # chat history
 accounts = db['accounts'] # account data
 files = db['files'] # file data
 
+# Create a dummy message
+message = "Hello, this is a test message."
+    
+# Insert the dummy message into the collection
+chats.insert_one(
+        {
+            "chat": message,
+            "creatorID": "Guest",
+        }
+    )
+
 def getChatHistory():
     chatHistory = list(chats.find({}, {"_id": 0}))
     return chatHistory
@@ -65,6 +76,7 @@ def home():
 @app.route('/chat-history', methods=['GET'])
 def pull_history():
     history = getChatHistory()
+    return jsonify(history), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
