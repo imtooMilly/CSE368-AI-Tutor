@@ -1,24 +1,18 @@
-version: '3.8'
-
+version: "3.3"
 services:
-  app:
-    build: .
-    ports:
-      - "5000:5000"   # Exposes Flask API
-    volumes:
-      - ./backend:/app
-    environment:
-      - FLASK_ENV=development
-    depends_on:
-      - mongo
-    restart: always
-
   mongo:
-    image: mongo:latest
+    image: mongo:4.2.5
+    container_name: mongodb
     ports:
       - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
 
-volumes:
-  mongo-data:
+  app:
+    build: .
+    container_name: app
+    environment:
+      WAIT_HOSTS: mongo:27017
+    ports:
+      - "3000:3000" # React Dev Server
+      - "8080:8080" # Flask Backend
+    depends_on:
+      - mongo
