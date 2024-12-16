@@ -6,7 +6,7 @@ import {
     Navigate,
   } from 'react-router-dom';
   import Home from './pages/Home';
-  // import Register from './page/Register';
+  import Register from './page/Signup';
   import Login from './pages/Login';
   // import Layout from './layout/Layout';
   

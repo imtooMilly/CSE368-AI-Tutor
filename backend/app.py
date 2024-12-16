@@ -62,5 +62,9 @@ def home():
     #         return render_template('index.html', form=form, error=f"An error occurred: {str(e)}")
     return render_template('index.html')
 
+@app.route('/chat-history', methods=['GET'])
+def pull_history():
+    history = getChatHistory()
+
 if __name__ == '__main__':
     app.run(debug=True)

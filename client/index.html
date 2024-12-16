@@ -1,114 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF File Upload</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f9;
-        }
-        .upload-container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .upload-container h2 {
-            margin-bottom: 20px;
-        }
-        .file-input {
-            margin-bottom: 10px;
-        }
-        .submit-btn {
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .submit-btn:hover {
-            background-color: #0056b3;
-        }
-        .error {
-            color: red;
-            margin-top: 10px;
-        }
-        .success {
-            color: green;
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div class="upload-container">
-        <h2>Upload a PDF File</h2>
-        <form id="uploadForm">
-            <input type="file" id="pdfFile" class="file-input" accept="application/pdf" required />
-            <br />
-            <button type="submit" class="submit-btn">Submit</button>
-        </form>
-        <div id="message" class="error"></div>
-    </div>
-
-    <script>
-        const form = document.getElementById('uploadForm');
-        const pdfFileInput = document.getElementById('pdfFile');
-        const message = document.getElementById('message');
-
-        form.addEventListener('submit', (event) => {
-            event.preventDefault(); // Prevent form submission
-            message.textContent = '';
-
-            const file = pdfFileInput.files[0];
-
-            if (!file) {
-                message.textContent = 'Please select a file.';
-                return;
-            }
-
-            if (file.type !== 'application/pdf') {
-                message.textContent = 'Only PDF files are allowed.';
-                return;
-            }
-
-            if (file.size > 50 * 1024 * 1024) { // 50MB limit
-                message.textContent = 'File size must be less than 50MB.';
-                return;
-            }
-
-            message.textContent = 'File is valid and ready for upload.';
-            message.classList.remove('error');
-            message.classList.add('success');
-
-            // Handle file submission (e.g., send to server)
-            // const formData = new FormData();
-            // formData.append('pdf', file);
-
-            // Uncomment below code to send file to the server
-            // fetch('/upload-endpoint', {
-            //     method: 'POST',
-            //     body: formData,
-            // })
-            // .then(response => response.json())
-            // .then(data => {
-            //     message.textContent = 'File uploaded successfully!';
-            //     message.classList.remove('error');
-            //     message.classList.add('success');
-            // })
-            // .catch(error => {
-            //     message.textContent = 'Error uploading file.';
-            // });
-        });
-    </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
