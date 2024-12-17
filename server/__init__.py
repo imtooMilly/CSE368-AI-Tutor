@@ -1,5 +1,6 @@
-from flask import Flask
-import json, jsonify
+from flask import Flask, jsonify
+import requests
+import json
 from .database import accounts, chats
 
 
@@ -26,7 +27,24 @@ def create_app(test_config=None):
     
     @app.route('/chat-history', methods=['GET'])
     def pull_history():
-        history = chats.getChatHistory()
-        return jsonify(history), 200
+        try:
+            # Assuming chatHistory is a list of messages
+            chat_history = chats.getChatHistory()  # Fetch history from the database
+            return jsonify(chat_history), 200
+        except Exception as e:
+            print(e)
+            return jsonify({"error": "Failed to fetch chat history"}), 500
+
+    @app.route('/send-chat', methods=['POST'])
+    def send_chat():
+        try:
+            data = requests.get_json()
+            message = data.get('message')
+            # Add the message to the chat history
+            add_message_to_history(message)
+            return jsonify({"success": True}), 200
+        except Exception as e:
+            print(e)
+            return jsonify({"error": "Failed to send message"}), 500
 
     return app

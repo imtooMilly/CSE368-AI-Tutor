@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const ChatPage = () => {
   const [chatText, setChatText] = useState('');
-  const [chatHistory, setChatHistory] = useState([]);
+  const [chatHistory, setChatHistory] = useState([]);  // Store chat history
 
-  // Function to fetch the chat history from Flask API
+  // Fetch chat history from the database
   const pullChat = async () => {
     try {
       const response = await fetch('/chat-history', {
@@ -12,48 +12,114 @@ const ChatPage = () => {
       });
       if (response.ok) {
         const jsonData = await response.json();
-        setChatHistory(jsonData); // Set the chat history state
+        setChatHistory(jsonData);  // Update chat history state, this will replace the old history
+      } else {
+        console.error('Failed to fetch chat history');
       }
     } catch (error) {
       console.error('Error fetching chat history:', error);
     }
   };
 
-  // Call pullChat when the component is mounted to fetch chat history
+  // Call pullChat when the component is mounted
   useEffect(() => {
     pullChat();
   }, []);
 
-  const sendChat = () => {
+  // Send a new chat message to the database
+  const sendChat = async () => {
     if (chatText.trim() !== '') {
-      console.log(chatText); // You can log or send the chat text to a server
-      setChatText(''); // Clear the input field after sending
+      try {
+        const response = await fetch('/send-chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ chat: chatText, creatorID: 'Guest' }),  // Send chat and creatorID to backend
+        });
+        if (response.ok) {
+          setChatText('');  // Clear input after sending
+          pullChat();  // Re-fetch chat history after sending a message
+        } else {
+          console.error('Failed to send chat message');
+        }
+      } catch (error) {
+        console.error('Error sending chat message:', error);
+      }
     }
   };
 
   return (
-    <div>
+    <div style={{ textAlign: 'center', marginTop: '20px' }}>
       <h1>Welcome, Ask me anything</h1>
 
-      <div id="chat-messages">
-        {/* Render the chat history */}
-        {chatHistory.map((message, index) => (
-          <div key={index}>{message}</div>
-        ))}
+      {/* Chat messages section */}
+      <div
+        id="chat-messages"
+        style={{
+          marginBottom: '20px',
+          padding: '10px',
+          maxWidth: '600px',
+          margin: '0 auto',
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          height: '300px',
+          overflowY: 'auto',
+        }}
+      >
+        {/* Render each chat message */}
+        {chatHistory.length > 0 ? (
+          chatHistory.map((message, index) => (
+            <div
+              key={message.chat + index}  // Use a unique key to avoid duplicate renders
+              style={{
+                marginBottom: '10px',
+                padding: '5px',
+                borderBottom: '1px solid #ddd',
+                fontSize: '14px',
+              }}
+            >
+              <strong>{message.creatorID}:</strong>
+              <p>{message.chat}</p>
+            </div>
+          ))
+        ) : (
+          <p>No chat history found</p>
+        )}
       </div>
 
-      <div className="chat-form">
-        <hr />
-        <label>
+      {/* Input field and Send button */}
+      <div className="chat-form" style={{ marginTop: '20px' }}>
+        <label htmlFor="chat-text-box" style={{ fontSize: '16px', marginRight: '10px' }}>
           Chat:
-          <input
-            id="chat-text-box"
-            type="text"
-            value={chatText}
-            onChange={(e) => setChatText(e.target.value)}
-          />
         </label>
-        <button onClick={sendChat}>Send</button>
+        <input
+          id="chat-text-box"
+          type="text"
+          value={chatText}
+          onChange={(e) => setChatText(e.target.value)}
+          style={{
+            padding: '10px',
+            fontSize: '16px',
+            marginRight: '10px',
+            width: '300px',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+          }}
+        />
+        <button
+          onClick={sendChat}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+        >
+          Send
+        </button>
       </div>
     </div>
   );
