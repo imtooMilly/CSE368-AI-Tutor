@@ -54,19 +54,23 @@
 
     <!-- Multiple-Choice Questions -->
     {% if mcqs %}
-        <h2>Generated Multiple Choice Questions:</h2>
+    <h2>Generated Multiple Choice Questions:</h2>
+    <ol>
         {% for mcq in mcqs %}
-            <div class="question-section">
-                <strong>{{ loop.index }}. {{ mcq.question }}</strong>
-                <ul class="mcq-choices">
+            <li>
+                <p><strong>{{ mcq.question }}</strong></p>
+                <ul>
                     {% for choice in mcq.choices %}
                         <li>{{ choice }}</li>
                     {% endfor %}
                 </ul>
-                <p><em>Correct Answer:</em> <strong>{{ mcq.correct_answer }}</strong></p>
-                <p><em>Explanation:</em> {{ mcq.explanation }}</p>
-            </div>
+                <p><strong>Correct Answer:</strong> {{ mcq.correct_answer }}</p>
+                <p><strong>Explanation:</strong> {{ mcq.explanation }}</p>
+            </li>
         {% endfor %}
-    {% endif %}
+    </ol>
+{% else %}
+    <p class="error">No multiple-choice questions were generated.</p>
+{% endif %}
 </body>
 </html>

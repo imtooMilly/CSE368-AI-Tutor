@@ -22,63 +22,73 @@ def generate_mcq_for_questions(questions, text):
     Returns:
         List[dict]: Multiple-choice questions with choices, correct answer, and explanations.
     """
-    print(f"Generating MCQs for Questions: {questions}")
-
     if not questions:
         print("No valid questions to generate MCQs.")
         return []
 
-    # Prepare prompt for generating MCQ options
-    prompt_text = f"For the following questions based on the text, generate multiple-choice answers:\n\n"
-    prompt_text += "Context Text:\n" + text + "\n\n"
-    prompt_text += "Questions:\n"
+    # Prepare the prompt for the API
+    prompt_text = (
+        f"Based on the following context, generate multiple-choice questions with correct answers and explanations:\n\n"
+        f"Context Text:\n{text}\n\nQuestions:\n"
+    )
     for q in questions:
         prompt_text += f"{q['question']}\n"
 
-    prompt_text += "\nFor each question, provide:\n"
-    prompt_text += "1. 4 answer choices (A, B, C, D)\n"
-    prompt_text += "2. The correct answer (e.g., A, B, C, or D)\n"
-    prompt_text += "3. A brief explanation for the answer."
+    prompt_text += (
+        "\nFormat the response like this:\n"
+        "**Question:** [The question here]\n"
+        "A) Choice 1\n"
+        "B) Choice 2\n"
+        "C) Choice 3\n"
+        "D) Choice 4\n"
+        "**Correct Answer:** [Correct choice letter]\n"
+        "**Explanation:** [Brief explanation]."
+    )
 
     headers = {"Content-Type": "application/json"}
-    data = {
-        "contents": [
-            {
-                "role": "user",
-                "parts": [{"text": prompt_text}]
-            }
-        ]
-    }
+    data = {"contents": [{"role": "user", "parts": [{"text": prompt_text}]}]}
 
     try:
         response = requests.post(GEMINI_API_URL, headers=headers, json=data)
         response.raise_for_status()
         result = response.json()
 
-        # Extract the full response text
+        # Extract the API response text
         full_response = result['candidates'][0]['content']['parts'][0]['text']
-        print(f"Full API Response for MCQs:\n{full_response}")
+        print("Full API Response:\n", full_response)
 
-        # Parse the response
         mcqs = []
-        question_blocks = re.split(r'\n\n', full_response.strip())
+        question_blocks = re.split(r'\n(?=\*\*Question:)', full_response.strip())
+
+        # Parse each question block
         for block in question_blocks:
-            question_match = re.search(r'\*\*(.*?)\*\*', block)  # Extract question
-            choices_match = re.findall(r'([a-d]\))\s(.*?)\n', block)  # Extract choices
-            correct_match = re.search(r'\*\*Answer:\*\*\s(.*?)\n', block)  # Correct Answer
-            explanation_match = re.search(r'\*\*Explanation:\*\*\s(.*?)$', block, re.DOTALL)  # Explanation
+            question_match = re.search(r'\*\*Question:\*\*\s*(.*?)\n', block)
+            choices_match = re.findall(r'([A-D])\)\s(.*?)\n', block)
+            correct_answer_match = re.search(r'\*\*Correct Answer:\*\*\s*([A-D])', block)
+            explanation_match = re.search(r'\*\*Explanation:\*\*\s*(.*?)$', block, re.DOTALL)
 
-            if question_match and choices_match and correct_match and explanation_match:
-                question = question_match.group(1).strip()
-                choices = [f"{choice[0]} {choice[1].strip()}" for choice in choices_match]
-                correct_answer = correct_match.group(1).strip()
-                explanation = explanation_match.group(1).strip()
-
+            if question_match and choices_match and correct_answer_match and explanation_match:
                 mcqs.append({
-                    "question": question,
-                    "choices": choices,
-                    "correct_answer": correct_answer,
-                    "explanation": explanation
+                    "question": question_match.group(1).strip(),
+                    "choices": [f"{choice[0]}) {choice[1].strip()}" for choice in choices_match],
+                    "correct_answer": correct_answer_match.group(1).strip(),
+                    "explanation": explanation_match.group(1).strip()
+                })
+
+        # Check if MCQs were parsed successfully
+        if not mcqs:
+            print("No valid MCQs parsed. Adding fallback MCQs.")
+            for q in questions:
+                mcqs.append({
+                    "question": q['question'],
+                    "choices": [
+                        "A) Placeholder Option 1",
+                        "B) Placeholder Option 2",
+                        "C) Placeholder Option 3",
+                        "D) Placeholder Option 4"
+                    ],
+                    "correct_answer": "A",
+                    "explanation": "The answer explanation is unavailable."
                 })
 
         return mcqs
@@ -86,6 +96,7 @@ def generate_mcq_for_questions(questions, text):
     except requests.exceptions.RequestException as e:
         print(f"Error generating MCQs with Google Gemini API: {e}")
         return []
+
 
 def generate_questions_from_file(file_path, num_questions=5):
     """
@@ -128,9 +139,11 @@ def generate_questions(text, num_questions=5):
         List[dict]: A list of dictionaries with 'question' and 'answer'.
     """
     # Updated prompt to include answers
-    prompt_text = f"Generate {num_questions} educational questions based on the following content. " \
-                  f"For each question, also provide a concise and accurate answer.\n\n{text}"
-    
+    prompt_text = (
+        f"Generate {num_questions} educational questions based on the following content. "
+        f"For each question, also provide a concise and accurate answer.\n\n{text}"
+    )
+
     headers = {"Content-Type": "application/json"}
     data = {
         "contents": [
@@ -146,13 +159,13 @@ def generate_questions(text, num_questions=5):
         response.raise_for_status()
         result = response.json()
 
-        # Parse the response into questions and answers
+        # Extract and parse the response
         questions_text = result['candidates'][0]['content']['parts'][0]['text']
         questions_and_answers = []
 
-        # Use regex to find Question and Answer pairs
+        # Use regex to split and extract Question/Answer pairs
         qa_pairs = re.split(r'\*\*Question.*?:\*\*', questions_text)
-        for pair in qa_pairs[1:]:  # Ignore the first empty split
+        for pair in qa_pairs[1:]:  # Skip the first split
             question_match = re.search(r'(.*?)\n', pair, re.DOTALL)
             answer_match = re.search(r'\*\*Answer:.*?\*\* (.*?)\n', pair, re.DOTALL)
 
@@ -161,7 +174,7 @@ def generate_questions(text, num_questions=5):
                 answer = answer_match.group(1).strip()
                 questions_and_answers.append({"question": question, "answer": answer})
 
-        return questions_and_answers[:num_questions]  # Return only the desired number
+        return questions_and_answers[:num_questions]  # Return the required number of questions
     except requests.exceptions.RequestException as e:
         print(f"Error generating questions with Google Gemini API: {e}")
         return []
