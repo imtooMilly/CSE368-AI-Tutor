@@ -2,8 +2,12 @@
 
 import os
 import requests
-from text_extraction import extract_text  # Import the text extraction function
 from dotenv import load_dotenv  # Import dotenv to load environment variables
+import pytesseract
+from PIL import Image
+import fitz
+import os
+from docx import Document
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,6 +20,49 @@ if not api_key:
     )
 
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+
+def extract_text_from_image(image_path):
+    """Extract text from a single image file using Tesseract OCR."""
+    try:
+        image = Image.open(image_path)
+        text = pytesseract.image_to_string(image)
+        return text
+    except Exception as e:
+        print(f"Error extracting text from image: {e}")
+        return None
+
+
+def extract_text_from_pdf(pdf_path):
+    """Extract text from a PDF file using PyMuPDF."""
+    text = ""
+    try:
+        # Open the PDF file
+        with fitz.open(pdf_path) as pdf:
+            # Iterate over each page
+            for page_num in range(pdf.page_count):
+                page = pdf[page_num]
+                text += f"\n\n--- Page {page_num + 1} ---\n\n"
+                text += page.get_text("text")
+        return text
+    except Exception as e:
+        print(f"Error extracting text from PDF: {e}")
+        return None
+
+
+def extract_text_from_docx(docx_path):
+    """Extract text from a .docx file using python-docx."""
+    try:
+        doc = Document(docx_path)
+        full_text = []
+        for paragraph in doc.paragraphs:
+            full_text.append(paragraph.text)
+        return "\n".join(full_text)
+    except Exception as e:
+        print(f"Error extracting text from DOCX: {e}")
+        return None
 
 
 def generate_quiz_with_preferences(text, num_questions=5, question_type="multiple-choice", difficulty="medium"):
@@ -117,6 +164,21 @@ def conversational_agent(query, context):
     except requests.exceptions.RequestException as e:
         print(f"Error querying the conversational agent: {e}")
         return "Unable to process the query. Please try again."
+    
+def extract_text(file_path):
+    """
+    Determine if the file is an image, PDF, or DOCX, then extract text accordingly.
+    Supports .jpg, .jpeg, .png, .pdf, and .docx file formats.
+    """
+    if file_path.lower().endswith(('.jpg', '.jpeg', '.png')):
+        return extract_text_from_image(file_path)
+    elif file_path.lower().endswith('.pdf'):
+        return extract_text_from_pdf(file_path)
+    elif file_path.lower().endswith('.docx'):
+        return extract_text_from_docx(file_path)
+    else:
+        print("Unsupported file type. Please use a .jpg, .jpeg, .png, .pdf, or .docx file.")
+        return None
 
 
 def interactive_quiz(file_path, num_questions=5, question_type="multiple-choice", difficulty="medium"):
@@ -149,11 +211,14 @@ def interactive_quiz(file_path, num_questions=5, question_type="multiple-choice"
             if user_query.lower() == "exit":
                 break
             response = conversational_agent(user_query, extracted_text)
+            return response
             print(f"Tutor: {response}")
     else:
         print("No text extracted from the file.")
+        response = "No text extracted from the file."
+        return response
 
 
 if __name__ == "__main__":
-    file_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\backend\tests\pdf\7-CSE305.pdf"
+    file_path = r"C:\Users\Milton\OneDrive\Desktop\cseHW\CSE368\CSE368-AI-Tutor\server\pdf\7-CSE305.pdf"
     interactive_quiz(file_path, num_questions=5, question_type="multiple-choice", difficulty="medium")
