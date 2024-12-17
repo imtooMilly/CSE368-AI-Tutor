@@ -35,11 +35,12 @@ const ChatPage = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ chat: chatText, creatorID: 'Guest' }),  // Send chat and creatorID to backend
+          body: JSON.stringify({ message: chatText }),
         });
         if (response.ok) {
-          setChatText('');  // Clear input after sending
-          pullChat();  // Re-fetch chat history after sending a message
+          console.log("Chat sent successfully");
+          setChatText(''); 
+          pullChat(); 
         } else {
           console.error('Failed to send chat message');
         }

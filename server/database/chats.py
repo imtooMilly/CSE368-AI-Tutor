@@ -13,25 +13,13 @@ def getChatHistory():
     return chatHistory
 
 def postChat(message, user):
-    chats.insert_one(
+    success = chats.insert_one(
         {
             "chat": message,
-            "creatorID": "Guest",
+            "creatorID": user,
         }
     )
     return True
-
-def create_comment(board_id, creator_id, content):
-    comment_id = token_urlsafe()
-    new_comment = {
-        "id": comment_id,
-        "BoardId": board_id,
-        "CreatorId": creator_id,
-        "Content": content,
-        "Time": datetime.now()
-    }
-    chats.insert_one(new_comment)
-    return comment_id
 
 def delete_comment(comment_id, user_id):
     comment = chats.find_one({"id", comment_id}, {"_id": False})

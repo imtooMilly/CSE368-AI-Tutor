@@ -1,7 +1,12 @@
-from flask import Flask, jsonify
-import requests
-import json
+from flask import Flask, jsonify, request, Request
+import json, jwt
 from .database import accounts, chats
+
+def get_session_username(request: Request):
+    token = request.cookies.get('AUTH_TOKEN', default=None)
+    decoded = jwt.decode(token, "SECRET_KET", algorithms=["HS256"])
+    username = decoded.get("uid")
+    return username
 
 
 def create_app(test_config=None):
@@ -38,13 +43,19 @@ def create_app(test_config=None):
     @app.route('/send-chat', methods=['POST'])
     def send_chat():
         try:
-            data = requests.get_json()
+            data = request.get_json()
             message = data.get('message')
+        
+            if not message:  # Handle missing or invalid messages
+                return jsonify({"error": "Message is required"}), 400
+        
             # Add the message to the chat history
-            add_message_to_history(message)
-            return jsonify({"success": True}), 200
+            success = chats.postChat(message, "Guest")
+            if success:
+                return jsonify({"success": True}), 201
+            else:
+                return jsonify({"error": "Failed to add chat"}), 500
         except Exception as e:
-            print(e)
             return jsonify({"error": "Failed to send message"}), 500
 
     return app
