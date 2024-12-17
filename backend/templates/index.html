@@ -19,45 +19,52 @@
         }
         .error {
             color: red;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <h1>Upload File to Generate Quiz</h1>
 
+    <!-- File Upload Form -->
     <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
-        {{ form.file.label }}: {{ form.file() }}
-        {{ form.submit() }}
+        <label for="file"><strong>File</strong></label>:
+        {{ form.file() }}
+        {{ form.submit(class="btn") }}
     </form>
 
+    <!-- Display Error if Present -->
     {% if error %}
         <p class="error">{{ error }}</p>
     {% endif %}
 
+    <!-- Open-Ended Questions with Answers -->
     {% if questions %}
         <h2>Generated Open-Ended Questions:</h2>
         <ul>
-            {% for question in questions %}
-                <li>{{ question }}</li>
+            {% for qa in questions %}
+                <li>
+                    <strong>{{ loop.index }}. {{ qa.question }}</strong><br>
+                    <em>Answer:</em> {{ qa.answer }}
+                </li>
             {% endfor %}
         </ul>
     {% endif %}
 
+    <!-- Multiple-Choice Questions -->
     {% if mcqs %}
         <h2>Generated Multiple Choice Questions:</h2>
         {% for mcq in mcqs %}
             <div class="question-section">
-                <strong>{{ mcq.question }}</strong>
-                <div class="mcq-choices">
-                    <ul>
-                        {% for choice in mcq.choices %}
-                            <li>{{ choice }}</li>
-                        {% endfor %}
-                    </ul>
-                    <p><em>Correct Answer: {{ mcq.correct_answer }}</em></p>
-                    <p>Explanation: {{ mcq.explanation }}</p>
-                </div>
+                <strong>{{ loop.index }}. {{ mcq.question }}</strong>
+                <ul class="mcq-choices">
+                    {% for choice in mcq.choices %}
+                        <li>{{ choice }}</li>
+                    {% endfor %}
+                </ul>
+                <p><em>Correct Answer:</em> <strong>{{ mcq.correct_answer }}</strong></p>
+                <p><em>Explanation:</em> {{ mcq.explanation }}</p>
             </div>
         {% endfor %}
     {% endif %}
