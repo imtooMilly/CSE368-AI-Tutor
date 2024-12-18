@@ -216,9 +216,8 @@ def interactive_quiz(file_path, num_questions=5, question_type="multiple-choice"
     else:
         print("No text extracted from the file.")
         response = "No text extracted from the file."
-        return response
 
 
 if __name__ == "__main__":
-    file_path = r"C:\Users\Milton\OneDrive\Desktop\cseHW\CSE368\CSE368-AI-Tutor\server\pdf\7-CSE305.pdf"
+    file_path = r"/Users/aaronessien/Documents/368/CSE368-AI-Tutor/server/pdf/Chapter2Notes.pdf"
     interactive_quiz(file_path, num_questions=5, question_type="multiple-choice", difficulty="medium")

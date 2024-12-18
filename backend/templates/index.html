@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Quiz</title>
+    <style>
+        /* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #FFF8DC; /* Soft yellow background */
+    color: #333; /* Dark text for contrast */
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading Styles */
+h1, h2 {
+    text-align: center;
+    font-weight: bold;
+    color: #6A5ACD; /* Soft purple */
+}
+
+h1 {
+    font-size: 2.2rem;
+}
+
+h2 {
+    margin-top: 30px;
+    font-size: 1.8rem;
+}
+
+/* Question and Answer Styling */
+.question-section {
+    margin-bottom: 20px;
+}
+
+.question {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #4B0082; /* Indigo for questions */
+}
+
+.answer, .explanation {
+    margin-left: 20px;
+    color: #555;
+    font-size: 1rem;
+}
+
+.correct-answer {
+    margin-left: 20px;
+    font-weight: bold;
+    color: #228B22; /* Green for correct answers */
+}
+
+/* Multiple-Choice List */
+ul.mcq-choices {
+    margin-left: 20px;
+    padding-left: 10px;
+    list-style-type: none;
+}
+
+ul.mcq-choices li {
+    margin: 5px 0;
+    font-size: 1rem;
+}
+
+/* Spacing */
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #ddd;
+    margin: 20px 0;
+}
+
+/* Button Styles */
+button, input[type="submit"] {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #6A5ACD;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover, input[type="submit"]:hover {
+    background-color: #483D8B;
+}
+
+    </style>
+</head>
+<body>
+    <h1>Upload File to Generate Quiz</h1>
+
+    <!-- File Upload Form -->
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <label for="file"><strong>File</strong></label>:
+        {{ form.file() }}
+        {{ form.submit(class="btn") }}
+    </form>
+
+    <!-- Display Error if Present -->
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <!-- Open-Ended Questions with Answers -->
+    {% if questions %}
+        <h2>Generated Open-Ended Questions:</h2>
+        <ul>
+            {% for qa in questions %}
+                <li>
+                    <strong>{{ loop.index }}. {{ qa.question }}</strong><br>
+                    <em>Answer:</em> {{ qa.answer }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Multiple-Choice Questions -->
+    {% if mcqs %}
+    <h2>Generated Multiple Choice Questions:</h2>
+    <ol>
+        {% for mcq in mcqs %}
+            <li>
+                <p><strong>{{ mcq.question }}</strong></p>
+                <ul>
+                    {% for choice in mcq.choices %}
+                        <li>{{ choice }}</li>
+                    {% endfor %}
+                </ul>
+                <p><strong>Correct Answer:</strong> {{ mcq.correct_answer }}</p>
+                <p><strong>Explanation:</strong> {{ mcq.explanation }}</p>
+            </li>
+        {% endfor %}
+    </ol>
+{% else %}
+    <p class="error">No multiple-choice questions were generated.</p>
+{% endif %}
+</body>
+</html>
