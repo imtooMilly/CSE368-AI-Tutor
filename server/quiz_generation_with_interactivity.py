@@ -164,7 +164,8 @@ def conversational_agent(query, context):
     except requests.exceptions.RequestException as e:
         print(f"Error querying the conversational agent: {e}")
         return "Unable to process the query. Please try again."
-    
+
+
 def extract_text(file_path):
     """
     Determine if the file is an image, PDF, or DOCX, then extract text accordingly.
@@ -207,7 +208,8 @@ def interactive_quiz(file_path, num_questions=5, question_type="multiple-choice"
             print(f"Answer: {item['answer']}\n")
 
         while True:
-            user_query = input("Ask the tutor a question about the content (or type 'exit' to quit): ")
+            user_query = input(
+                "Ask the tutor a question about the content (or type 'exit' to quit): ")
             if user_query.lower() == "exit":
                 break
             response = conversational_agent(user_query, extracted_text)
@@ -220,5 +222,6 @@ def interactive_quiz(file_path, num_questions=5, question_type="multiple-choice"
 
 
 if __name__ == "__main__":
-    file_path = r"C:\Users\Milton\OneDrive\Desktop\cseHW\CSE368\CSE368-AI-Tutor\server\pdf\7-CSE305.pdf"
-    interactive_quiz(file_path, num_questions=5, question_type="multiple-choice", difficulty="medium")
+    file_path = r"C:\Users\oluwa\OneDrive - University at Buffalo\CSE 368\Project\CSE368-AI-Tutor\server\pdf\7-CSE305.pdf"
+    interactive_quiz(file_path, num_questions=5,
+                     question_type="multiple-choice", difficulty="medium")
